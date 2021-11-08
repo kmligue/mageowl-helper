@@ -13,13 +13,5 @@
         "psr-4": {
             "Mageowl\\Helper\\": ""
         }
-    },
-    "extra": {
-        "map": [
-            [
-                "*",
-                "Mageowl/Helper"
-            ]
-        ]
     }
 }
