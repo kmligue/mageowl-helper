@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Mageowl_Helper::mageowl_helper"
+             title="MageOwl"
+             module="Mageowl_Helper"
+             resource="Mageowl_Helper::config_helper"
+             sortOrder="200"/>
+    </menu>
+</config>

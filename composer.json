@@ -1,0 +1,25 @@
+{
+    "name": "mageowl/helper",
+    "description": "",
+    "require": {
+        "kreait/firebase-php": "^5.25"
+    },
+    "type": "magento2-module",
+    "version": "0.1.0",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Mageowl\\Helper\\": ""
+        }
+    },
+    "extra": {
+        "map": [
+            [
+                "*",
+                "Mageowl/Helper"
+            ]
+        ]
+    }
+}

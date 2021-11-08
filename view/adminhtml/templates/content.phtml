@@ -1,0 +1,407 @@
+<?php
+/**
+ * @var $block \Mageowl\Helper\Block\Adminhtml\Content
+ */
+?>
+
+<?php if ($block->isEnable()): ?>
+    <?php
+        $videos = $block->getVideos($block->getControllerName() . '-----' . $block->getActionName());
+    ?>
+    <div id="helper-modal" style="display:none;">
+        <!--<div><?php echo $block->getControllerName() . '::' . $block->getActionName(); ?></div>-->
+
+        <table id="mageowl-table">
+            <tbody>
+                <?php if (!empty($videos)): ?>
+                    <?php foreach ($videos as $video): ?>
+                        <tr>
+                            <td>
+                                <a href="https://www.youtube.com/embed/<?php echo $video['video_id']; ?>" class="lightbox"><?php echo $video['title']; ?></a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <h1 class="text-center" style="margin-bottom: 0;">No videos available for this section.</h1>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="mageowl-add-modal" style="display: none;">
+        <table id="mageowl-table">
+            <tbody>
+                <?php if (empty($videos)): ?>
+                    <tr>
+                        <td colspan="2">
+                            <div class="mageowl-table-show" style="display: none;">
+                                <div class="mageowl-table-controls">
+                                    <button type="button" class="mageowl-edit-video"><span class="icon-edit"></span></button>
+                                    <button type="button" class="mageowl-remove-video"><span class="icon-remove"></span></button>
+                                </div>
+                            </div>
+
+                            <div class="mageowl-table-edit" style="display: block;">
+                                <div class="form-group">
+                                    <input type="text" name="titles[]" value="" placeholder="Title">
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="text" name="urls[]" value="" placeholder="Url">
+                                </div>
+
+                                <div class="form-group text-right">
+                                    <button type="button" class="mageowl-save-video">Save</button>
+                                    <!-- <button type="button" class="mageowl-remove-video"><span class="icon-remove"></span></button> -->
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach ($videos as $video): ?>
+                        <tr>
+                            <td width="9%">
+                                <button type="button" class="handle"><span class="icon-drag"></span></button>
+                            </td>
+                            <td>
+                                <div class="mageowl-table-show">
+                                    <?php echo $video['title']; ?>
+                                    <div class="mageowl-table-controls">
+                                        <button type="button" class="mageowl-edit-video"><span class="icon-edit"></span></button>
+                                        <button type="button" class="mageowl-remove-video"><span class="icon-remove"></span></button>
+                                    </div>
+                                </div>
+
+                                <div class="mageowl-table-edit">
+                                    <div class="form-group">
+                                        <label>Title</label>
+                                        <input type="text" name="titles[]" value="<?php echo $video['title']; ?>" placeholder="Title">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Url</label>
+                                        <input type="text" name="urls[]" value="<?php echo $video['url']; ?>" placeholder="Url">
+                                    </div>
+
+                                    <div class="form-group text-right">
+                                        <button type="button" class="mageowl-save-video">Save</button>
+                                        <!-- <button type="button" class="mageowl-close-video"><span class="icon-remove"></span></button> -->
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="mageowl-video-modal" style="display: none;"></div>
+
+    <script>
+        require(
+            [
+                'jquery',
+                'Magento_Ui/js/modal/modal',
+                'Magento_Theme/js/sortable'
+            ],
+            function (
+                $,
+                modal
+            ) {
+                var role_name = '<?php echo $block->getCurrentUserRoleName(); ?>';
+                var buttons = [];
+                if (role_name == 'Administrators') {
+                    buttons.push({
+                        text: $.mage.__('Create'),
+                        class: 'float-left',
+                        click: function () {
+                            $("#mageowl-add-modal").modal("openModal");
+                        }
+                    });
+                }
+
+                buttons.push({
+                    text: $.mage.__('Close'),
+                    class: '',
+                    click: function () {
+                        this.closeModal();
+                    }
+                });
+
+                var options = {
+                    type: 'popup',
+                    modalClass: 'mageowl-modal',
+                    responsive: true,
+                    innerScroll: true,
+                    title: '<div class="mageowl-logo"></div> Videos',
+                    buttons: buttons
+                };
+
+                modal(options, $('#helper-modal'));
+
+                modal({
+                    type: 'popup',
+                    modalClass: 'mageowl-modal',
+                    responsive: true,
+                    innerScroll: true,
+                    title: '<div class="mageowl-logo"></div> Add Video',
+                    buttons: [
+                        {
+                            text: '<span class="icon-plus"></span>',
+                            class: 'float-left mr-10',
+                            click: function () {
+                                var html = `
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="mageowl-table-edit" style="display: block;">
+                                                <div class="form-group">
+                                                    <label>Title</label>
+                                                    <input type="text" name="titles[]" value="" placeholder="Title">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Url</label>
+                                                    <input type="text" name="urls[]" value="" placeholder="Url">
+                                                </div>
+
+                                                <div class="form-group text-right" style="display: block;">
+                                                    <button type="button" class="mageowl-save-video">Save</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+
+                                $('#mageowl-add-modal tbody').append(html);
+                            }
+                        },
+                        {
+                            text: $.mage.__('Close'),
+                            class: '',
+                            click: function () {
+                                this.closeModal();
+                            }
+                        }
+                    ]
+                }, $('#mageowl-add-modal'));
+
+                modal({
+                    type: 'popup',
+                    modalClass: 'mageowl-modal',
+                    responsive: true,
+                    innerScroll: true,
+                    title: '<div class="mageowl-logo"></div> Video',
+                    buttons: [
+                        {
+                            text: $.mage.__('Close'),
+                            class: '',
+                            click: function () {
+                                this.closeModal();
+                            }
+                        }
+                    ]
+                }, $('#mageowl-video-modal'));
+
+                $("#menu-mageowl-helper-mageowl-helper").on('click', function () {
+                    $("#helper-modal").modal("openModal");
+                });
+
+                $('body').on('click', '.lightbox', function(e) {
+                    e.preventDefault();
+
+                    var href = $(this).attr('href');
+                    var iframe = '<iframe width="560" height="560" src="'+ href +'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%;"></iframe>';
+
+                    $('#mageowl-video-modal').html(iframe);
+
+                    $("#mageowl-video-modal").modal("openModal");
+                });
+
+                $('body').on('click', '.mageowl-remove-video', function(e) {
+                    e.preventDefault();
+
+                    if (confirm('Are you sure?')) {
+                        $(this).closest('tr').remove();
+                        saveVideos(true, false);
+                    }
+                });
+
+                $('#mageowl-table tbody').sortable({
+                    handle: '.handle',
+                    cancel: '',
+                    update: function() {
+                        saveVideos(false, false);
+                    }
+                });
+
+                $('body').on('click', '.mageowl-edit-video', function(e) {
+                    e.preventDefault();
+
+                    var tr = $(this).closest('tr');
+                    var td = $(this).closest('td');
+
+                    $('.mageowl-table-show').show();
+                    $('.mageowl-table-edit').hide();
+                    $('#mageowl-table td:first-child').show();
+                    $('#mageowl-table td').removeAttr('colspan');
+
+                    tr.find('td:first-child').hide();
+                    tr.find('td').prop('colspan', '2');
+
+                    td.find('.mageowl-table-show').hide();
+                    td.find('.mageowl-table-edit').show();
+                });
+
+                $('body').on('click', '.mageowl-close-video', function(e) {
+                    e.preventDefault();
+
+                    var td = $(this).closest('td');
+
+                    td.find('.mageowl-table-show').show();
+                    td.find('.mageowl-table-edit').hide();
+                });
+
+                $('body').on('click', '.mageowl-save-video', function(e) {
+                    e.preventDefault();
+
+                    var td = $(this).closest('td');
+
+                    var urls = [];
+                    var titles = [];
+
+                    $('input[name="urls[]"]').each(function(i, elem) {
+                        var url = $(elem).val();
+
+                        urls.push(url);
+                    });
+
+                    $('input[name="titles[]"]').each(function(i, elem) {
+                        var title = $(elem).val();
+
+                        titles.push(title);
+                    });
+
+                    $.ajax({
+                        url: '<?php echo $this->getUrl('mageowl/saveVideos'); ?>',
+                        method: 'POST',
+                        data: {
+                            form_key: window.FORM_KEY,
+                            controller_name: '<?php echo $block->getControllerName(); ?>',
+                            action_name: '<?php echo $block->getActionName(); ?>',
+                            urls: urls,
+                            titles: titles
+                        },
+                        showLoader: true,
+                        success: function(response) {
+                            if (response.success) {
+                                var html1 = '';
+                                var html2 = '';
+
+                                for (var i = 0; i < response.data.length; i++) {
+                                    html1 += `
+                                        <tr>
+                                            <td>
+                                                <a href="https://www.youtube.com/embed/${response.data[i].video_id}" class="lightbox">${response.data[i].title}</a>
+                                            </td>
+                                        </tr>
+                                    `;
+
+                                    html2 += `
+                                        <tr>
+                                            <td width="9%">
+                                                <button type="button" class="handle"><span class="icon-drag"></span></button>
+                                            </td>
+                                            <td>
+                                                <div class="mageowl-table-show">
+                                                    ${response.data[i].title}
+                                                    <div class="mageowl-table-controls">
+                                                        <button type="button" class="mageowl-edit-video"><span class="icon-edit"></span></button>
+                                                        <button type="button" class="mageowl-remove-video"><span class="icon-remove"></span></button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mageowl-table-edit">
+                                                    <div class="form-group">
+                                                        <label>Title</label>
+                                                        <input type="text" name="titles[]" value="${response.data[i].title}" placeholder="Title">
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label>Url</label>
+                                                        <input type="text" name="urls[]" value="${response.data[i].url}" placeholder="Url">
+                                                    </div>
+
+                                                    <div class="form-control text-right">
+                                                        <button type="button" class="mageowl-save-video">Save</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }
+
+                                $('#helper-modal #mageowl-table tbody').html(html1);
+                                $('#mageowl-add-modal #mageowl-table tbody').html(html2);
+
+                                td.find('.mageowl-table-show').show();
+                                td.find('.mageowl-table-edit').hide();
+                            }
+                        }
+                    });
+                });
+
+                function saveVideos(showLoader, closeModal) {
+                    var urls = [];
+                    var titles = [];
+
+                    $('input[name="urls[]"]').each(function(i, elem) {
+                        var url = $(elem).val();
+
+                        urls.push(url);
+                    });
+
+                    $('input[name="titles[]"]').each(function(i, elem) {
+                        var title = $(elem).val();
+
+                        titles.push(title);
+                    });
+
+                    $.ajax({
+                        url: '<?php echo $this->getUrl('mageowl/saveVideos'); ?>',
+                        method: 'POST',
+                        data: {
+                            form_key: window.FORM_KEY,
+                            controller_name: '<?php echo $block->getControllerName(); ?>',
+                            action_name: '<?php echo $block->getActionName(); ?>',
+                            urls: urls,
+                            titles: titles
+                        },
+                        showLoader: showLoader,
+                        success: function(response) {
+                            if (response.success) {
+                                var html = '';
+
+                                for (var i = 0; i < response.data.length; i++) {
+                                    html += `
+                                        <tr>
+                                            <td>
+                                                <a href="https://www.youtube.com/embed/${response.data[i].video_id}" class="lightbox">${response.data[i].title}</a>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }
+
+                                $('#helper-modal #mageowl-table tbody').html(html);
+
+                                if (closeModal) {
+                                    $("#mageowl-add-modal").modal("closeModal");
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        );
+    </script>
+<?php endif; ?>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+
+    <system>
+        <!--CONFIG SECTION-->
+        <section id="mageowl" translate="label" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>MageOwl</label>
+            <tab>general</tab>
+            <resource>Mageowl_Helper::config_helper</resource>
+
+            <!-- GENERAL -->
+            <group id="config" translate="label"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+
+                <field id="enable" translate="label comment" type="select" sortOrder="0" showInDefault="1">
+                    <label>Enable module</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="firebase_config_json" translate="label" type="textarea" sortOrder="55" showInDefault="1">
+                    <label>Firebase Config JSON</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
